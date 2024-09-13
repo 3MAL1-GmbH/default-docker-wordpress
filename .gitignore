@@ -3,3 +3,5 @@ plugins/
 themes/
 uploads/
 index.php
+wp-config.php
+.vscode/
