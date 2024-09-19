@@ -58,7 +58,7 @@ services:
     image: busybox
     volumes:
       - wordpress-core:/var/www/html/
-    command: sh -c "cp -r /data/plugins/* /var/www/html/wp-content/plugins/ && cp -r /data/uploads/* /var/www/html/wp-content/uploads/"
+    command: sh /usr/local/bin/busybox-script.sh
     networks:
       - wordpress-network
 
