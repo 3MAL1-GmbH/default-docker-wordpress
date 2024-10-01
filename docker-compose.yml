@@ -1,0 +1,96 @@
+version: '3.1'
+
+services:
+  database:
+    image: mariadb:10.6.4-focal
+    container_name: '${BRAND_NAME}_database'
+    restart: unless-stopped
+    ports:
+      - '3306:3306'
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: '${MYSQL_DATABASE}'
+      MYSQL_USER: '${MYSQL_USER}'
+      MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - wordpress-network
+
+  phpmyadmin:
+    container_name: '${BRAND_NAME}_phpmyadmin'
+    depends_on:
+      - database
+    image: phpmyadmin/phpmyadmin
+    restart: unless-stopped
+    ports:
+      - '8081:80'
+    env_file: .env
+    environment:
+      PMA_HOST: database
+      MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+    networks:
+      - wordpress-network
+
+  wordpress:
+    container_name: '${BRAND_NAME}_wordpress'
+    depends_on:
+      - database
+    image: wordpress:latest
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: database:3306
+      WORDPRESS_DB_NAME: '${MYSQL_DATABASE}'
+      WORDPRESS_DB_USER: '${MYSQL_USER}'
+      WORDPRESS_DB_PASSWORD: '${MYSQL_PASSWORD}'
+    volumes:
+      - wordpress-core:/var/www/html/
+      - themes:/var/www/html/wp-content/themes/
+      - plugins:/var/www/html/wp-content/plugins/
+      - uploads:/var/www/html/wp-content/uploads/
+      - ./themes:/var/www/html/wp-content/themes/
+      - ./plugins:/var/www/html/wp-content/plugins/
+      - ./uploads:/var/www/html/wp-content/uploads/
+    networks:
+      - wordpress-network
+
+  # helper:
+  #   image: busybox
+  #   command: sh /usr/local/bin/busybox-script.sh
+  #   volumes:
+  #     - wordpress-core:/var/www/html/
+  #   environment:
+  #     - BRAND_NAME=${BRAND_NAME}
+
+
+  # mailpit:
+  #   image: axllent/mailpit
+  #   container_name: '${BRAND_NAME}_mailpit'
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./mailpit:/data
+  #   ports:
+  #     - 8090:8025
+  #     - 8091:1025
+  #   environment:
+  #     MP_MAX_MESSAGES: 5000
+  #     MP_DATABASE: /data/mailpit.db
+  #     MP_SMTP_AUTH_ACCEPT_ANY: 1
+  #     MP_SMTP_AUTH_ALLOW_INSECURE: 1
+  #   networks:
+  #   - wordpress-network
+
+volumes:
+  db-data:
+  plugins:
+  themes:
+  uploads:
+  wordpress-core:
+
+networks:
+  wordpress-network:
+    driver: bridge
