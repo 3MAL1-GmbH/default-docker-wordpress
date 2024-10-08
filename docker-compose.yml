@@ -49,22 +49,11 @@ services:
       WORDPRESS_DB_PASSWORD: '${MYSQL_PASSWORD}'
     volumes:
       - wordpress-core:/var/www/html/
-      - themes:/var/www/html/wp-content/themes/
-      - plugins:/var/www/html/wp-content/plugins/
-      - uploads:/var/www/html/wp-content/uploads/
       - ./themes:/var/www/html/wp-content/themes/
       - ./plugins:/var/www/html/wp-content/plugins/
       - ./uploads:/var/www/html/wp-content/uploads/
     networks:
       - wordpress-network
-
-  # helper:
-  #   image: busybox
-  #   command: sh /usr/local/bin/busybox-script.sh
-  #   volumes:
-  #     - wordpress-core:/var/www/html/
-  #   environment:
-  #     - BRAND_NAME=${BRAND_NAME}
 
 
   # mailpit:
@@ -86,9 +75,6 @@ services:
 
 volumes:
   db-data:
-  plugins:
-  themes:
-  uploads:
   wordpress-core:
 
 networks:
